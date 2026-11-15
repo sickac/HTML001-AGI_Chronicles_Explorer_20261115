@@ -1,0 +1,514 @@
+<!-- v20261115 - 0936, v010 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The AGI Chronicles – Explorer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+/* Base scale: 1rem = 25px. A-/A+ buttons change it. */
+:root{--red:#EE0000;--ink:#222222;--gray:#7F8892;--light:#F2F3F4;--yellow:#FFF200}
+html{font-size:25px;-webkit-text-size-adjust:100%}
+*{box-sizing:border-box;-webkit-tap-highlight-color:rgba(238,0,0,.15)}
+body{margin:0;font-family:Gotham,Aptos,Calibri,Arial,sans-serif;font-size:1rem;line-height:1.45;color:var(--ink);background:#fff}
+header{padding:.6rem .7rem .3rem;border-bottom:.12rem solid var(--red)}
+h1{font-size:1.36rem;margin:0 0 .2rem;line-height:1.15}
+.sub{color:var(--gray);font-size:.8rem}
+nav{position:sticky;top:0;z-index:5;background:var(--light);padding:.4rem .5rem;box-shadow:0 2px 0 #ddd}
+.tabs,.sorts{display:grid;gap:.25rem}
+.tabs{grid-template-columns:repeat(4,1fr)}
+.sorts{grid-template-columns:1fr 1fr auto auto;margin-top:.3rem}
+nav button{border:0;background:#fff;min-height:2.6rem;padding:.3rem .2rem;font:inherit;font-size:.9rem;font-weight:bold;cursor:pointer;border-radius:.3rem;color:var(--ink)}
+nav button.active{background:var(--red);color:#fff}
+.sorts button{min-height:2.3rem;font-size:.8rem;border:2px solid var(--red);color:var(--red)}
+.sorts button.active{background:var(--red);color:#fff}
+.sorts .z{min-width:2.4rem;border-color:var(--gray);color:var(--gray)}
+nav input{display:block;width:100%;margin-top:.3rem;min-height:2.4rem;padding:.3rem .5rem;border:2px solid #ccc;border-radius:.3rem;font:inherit;font-size:.9rem}
+#list .item{min-height:3rem;padding:.4rem .6rem;border-bottom:2px solid #e5e5e5;cursor:pointer;display:flex;align-items:center;gap:.45rem}
+#list .item:active,#list .item:hover{background:var(--light)}
+#list .item::after{content:"›";color:var(--gray);font-size:1.4rem;margin-left:.1rem}
+.nm{flex:1;line-height:1.2}
+.count{color:var(--gray);font-size:.75rem;white-space:nowrap}
+.rank{color:var(--gray);font-size:.8rem;margin-right:.25rem}
+.thumb{width:2.2rem;height:2.2rem;flex:none;border-radius:50%;background:var(--light);border:1px solid #ddd;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:.75rem;color:var(--gray)}
+.thumb.sq{border-radius:.25rem;background:#fff}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb.sq img{object-fit:contain;padding:.12rem}
+#detail{padding:.5rem .7rem 3rem;max-width:60rem;margin:0 auto}
+main.show-detail #list{display:none}
+main:not(.show-detail) #detail{display:none}
+#back{display:block;width:100%;min-height:2.6rem;border:0;background:var(--light);font:inherit;font-size:.95rem;font-weight:bold;padding:.4rem .6rem;text-align:left;margin-bottom:.6rem;border-radius:.3rem;color:var(--red);cursor:pointer}
+h2{color:var(--red);font-size:1.25rem;margin:.2rem 0 .2rem;line-height:1.2}
+h3{font-size:1rem;margin:1.2rem 0 .35rem;border-bottom:2px solid #ddd;padding-bottom:.15rem}
+p{margin:.4rem 0}
+.hero{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.hero>div:last-child{width:100%}
+.photo{width:8rem;height:10rem;background:var(--light);border:1px solid #ddd;border-radius:.3rem;display:flex;align-items:center;justify-content:center;font-size:2.6rem;font-weight:bold;color:var(--gray);overflow:hidden}
+.photo.sq{width:7rem;height:7rem;background:#fff}
+.photo img{width:100%;height:100%;object-fit:cover}
+.photo.sq img{object-fit:contain;padding:.3rem}
+a.lnk{color:var(--red);cursor:pointer;text-decoration:none;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th{background:var(--red);color:#fff;text-align:left;padding:.3rem .4rem;font-size:.8rem}
+td{padding:0 .4rem;border-bottom:2px solid #eee;vertical-align:middle;height:2.6rem}
+tr:nth-child(even) td{background:#fafafa}
+td a.lnk{display:flex;align-items:center;gap:.3rem;padding:.4rem 0}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.chips a.lnk{display:inline-flex;align-items:center;gap:.25rem;min-height:2.3rem;padding:.2rem .5rem .2rem .25rem;border:2px solid var(--red);border-radius:1.2rem;font-size:.85rem;background:#fff}
+.chips .thumb,td .thumb{width:1.6rem;height:1.6rem;font-size:.55rem}
+.tag{display:inline-block;font-size:.6rem;padding:.05rem .25rem;border-radius:.15rem;vertical-align:middle;font-weight:normal}
+.src{background:#e6f4ea;color:#1e6b34}.inf{background:var(--light);color:var(--gray)}
+.verify{background:var(--yellow);font-size:.7rem;padding:0 .1rem}
+.wiki{display:inline-flex;align-items:center;min-height:2rem;margin:.25rem .3rem .25rem 0;padding:.2rem .6rem;border:2px solid var(--gray);border-radius:.3rem;color:var(--ink);text-decoration:none;font-weight:600;font-size:.8rem;background:#fff}
+.wiki.sm{min-height:1.6rem;font-size:.68rem;padding:.1rem .45rem;margin:.15rem .3rem .15rem 0}
+.wiki:active{background:var(--light)}
+.conn{border-bottom:2px solid #eee;padding:.5rem 0}
+.conn .top{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.conn .top a.lnk{display:inline-flex;align-items:center;gap:.35rem;font-size:.95rem;min-height:2.2rem}
+.conn .why{margin:.2rem 0 .1rem 2.55rem;font-size:.85rem}
+.conn .refs{margin-left:2.55rem}
+.ctype{font-size:.62rem;font-weight:bold;text-transform:uppercase;letter-spacing:.03em;padding:.05rem .3rem;border-radius:.15rem;background:var(--light);color:var(--gray)}
+.ctype.rival{background:#fde5e5;color:#b00000}
+.note{font-size:.7rem;color:var(--gray);margin-top:1.4rem;border-top:2px solid #ddd;padding-top:.4rem}
+</style>
+</head>
+<body>
+<header>
+<h1>The AGI Chronicles – Explorer</h1>
+<div class="sub">Kevin Roose · FSG · Oct 6, 2026 · Draft research aid</div>
+</header>
+<nav>
+<div class="tabs"><button data-v="people" class="active">People</button><button data-v="companies">Companies</button><button data-v="schools">Schools</button><button data-v="projects">Projects</button></div>
+<div class="sorts" id="sorts"><button data-s="exp" class="active">Book exposure</button><button data-s="az">A–Z</button><button class="z" data-z="-1">A−</button><button class="z" data-z="1">A+</button></div>
+<input id="q" placeholder="Filter…">
+</nav>
+<main><div id="list"></div><div id="detail"></div></main>
+
+<script>
+/* Safe wrappers: sandboxed previews block localStorage and history */
+const STORE=(()=>{const mem={};let ls=null;try{ls=window.localStorage;ls.getItem("x");}catch(e){ls=null;}
+ return{get:k=>{try{return ls?ls.getItem(k):(k in mem?mem[k]:null);}catch(e){return k in mem?mem[k]:null;}},
+        set:(k,v)=>{mem[k]=String(v);try{if(ls)ls.setItem(k,v);}catch(e){}}};})();
+let HIST_OK=true;try{history.replaceState(history.state,"");}catch(e){HIST_OK=false;}
+const NAV=[];
+function hPush(st){NAV.push(st);if(HIST_OK){try{history.pushState(st,"");}catch(e){HIST_OK=false;}}}
+function hBack(){if(HIST_OK&&NAV.length>1){try{history.back();return;}catch(e){HIST_OK=false;}}
+ NAV.pop();applyState(NAV[NAV.length-1]||{v:"people"});}
+
+const W = n => "https://en.wikipedia.org/wiki/" + n;
+const P = [
+{id:"altman",n:"Sam Altman",b:"S",wiki:W("Sam_Altman"),
+ bio:"Co-founder and CEO of OpenAI. Turned an AI research nonprofit into the company behind ChatGPT and drove the industry's capital and compute race. Fired by OpenAI's board in November 2023 and reinstated days later. In the book: his rivalries with Amodei, Hassabis and Musk, and his 2015 letter to Musk arguing AI was coming anyway and it was better if Google did not build it first.",
+ s:["Stanford University"],c:[["Loopt","2005–2012"],["Y Combinator","2011–2019"],["OpenAI","2015–"]],
+ pr:["ChatGPT","GPT-4","OpenAI nonprofit / capped-profit structure","2023 OpenAI board crisis"]},
+{id:"amodei",n:"Dario Amodei",b:"S",wiki:W("Dario_Amodei"),
+ bio:"Co-founder and CEO of Anthropic. An early believer in scaling who led OpenAI's GPT-2 and GPT-3 research before leaving at the end of 2020 over safety, transparency and governance disputes, including the 2017 'countries plan'. Roose calls him the book's most fascinating moral case study: he warns about AI risk while racing to build it.",
+ s:["Caltech","Stanford University","Princeton University"],c:[["Baidu","2014–2015"],["Google Brain","2015–2016"],["OpenAI","2016–2020"],["Anthropic","2021–"]],
+ pr:["GPT-2","GPT-3","Scaling laws","Claude","Responsible Scaling Policy (ASL levels)","Countries plan (2017)","Concrete Problems in AI Safety (2016)","RLHF"]},
+{id:"hassabis",n:"Demis Hassabis",b:"S",wiki:W("Demis_Hassabis"),
+ bio:"Co-founder and CEO of DeepMind, now Google DeepMind. Former chess prodigy and game designer turned neuroscientist; shared the 2024 Nobel Prize in Chemistry for AlphaFold. In the book he has predicted AGI around 2030 since 2010, dismissed GPT-2 at first, and proposes a federal standards body for AI developers.",
+ s:["University of Cambridge","University College London"],c:[["Bullfrog Productions","~1994–1997"],["Lionhead Studios","1998"],["Elixir Studios","1998–2005"],["DeepMind / Google DeepMind","2010–"],["Isomorphic Labs","2021–"]],
+ pr:["AlphaGo","AlphaFold","Gemini","Google Brain–DeepMind merger (2023)"]},
+{id:"musk",n:"Elon Musk",b:"S",wiki:W("Elon_Musk"),
+ bio:"Co-founded and funded OpenAI as a nonprofit in 2015, inspired partly by Bostrom's Superintelligence. When his funding wavered in 2017–18 he left. He later founded rival xAI and sued OpenAI. In the book he dismisses an early pre-Transformer Radford chatbot and accuses Google's Gemini of bias.",
+ s:["Queen's University","University of Pennsylvania"],c:[["Zip2","1995–1999"],["X.com / PayPal","1999–2002"],["SpaceX","2002–"],["Tesla","2004–"],["OpenAI","2015–2018"],["xAI","2023–"]],
+ pr:["OpenAI nonprofit / capped-profit structure","Grok"]},
+{id:"sutskever",n:"Ilya Sutskever",b:"S",wiki:W("Ilya_Sutskever"),
+ bio:"Hinton's student and co-author of AlexNet. He co-founded OpenAI as chief scientist and was a central believer in scaling. Co-proposed the 2017 'countries plan' with Brockman and played a key role in the 2023 board action against Altman. Left in 2024 to found Safe Superintelligence. In 2012 he doubted human-level AI was possible.",
+ s:["Open University of Israel","University of Toronto"],c:[["DNNresearch","2012–2013"],["Google Brain","2013–2015"],["OpenAI","2015–2024"],["Safe Superintelligence","2024–"]],
+ pr:["AlexNet","Seq2seq","GPT-2","GPT-3","Superalignment","Countries plan (2017)","2023 OpenAI board crisis"]},
+{id:"brockman",n:"Greg Brockman",b:"S",wiki:W("Greg_Brockman"),
+ bio:"Co-founder of OpenAI and its engineering engine. Previously the first CTO at Stripe. Co-authored the 2017 'countries plan' to sell rights to OpenAI's future AGI to governments. Quit when Altman was fired in 2023 and returned with him.",
+ s:["Harvard University","MIT"],c:[["Stripe","2010–2015"],["OpenAI","2015–"]],
+ pr:["Countries plan (2017)","ChatGPT","2023 OpenAI board crisis"]},
+{id:"radford",n:"Alec Radford",b:"S",wiki:W("Alec_Radford"),
+ bio:"The quiet researcher behind the original GPT. He nearly quit OpenAI over slow progress after Musk dismissed his early chatbot, and in 2018 considered dropping GPT in favor of reinforcement learning. Lead author of GPT-1 and GPT-2; also worked on CLIP and Whisper.",
+ s:["Olin College ?"],c:[["indico ?","~2013–2016"],["OpenAI","2016–2024"]],
+ pr:["GPT-1","GPT-2","CLIP"]},
+{id:"kaplan",n:"Jared Kaplan",b:"S",wiki:W("Jared_Kaplan"),
+ bio:"Theoretical physicist and Anthropic co-founder. Lead author of the 2020 scaling-laws paper, which turned 'bigger is better' into a predictable relationship. In the book, he is consulted on whether Claude 3.7 Sonnet crossed the ASL-3 bio-risk threshold.",
+ s:["Stanford University","Harvard University"],c:[["Johns Hopkins University","~2012–"],["OpenAI","~2019–2020 ?"],["Anthropic","2021–"]],
+ pr:["Scaling laws","GPT-3","Claude","Responsible Scaling Policy (ASL levels)"]},
+{id:"daniela",n:"Daniela Amodei",b:"I",wiki:W("Daniela_Amodei"),
+ bio:"Dario's sister and co-founder and president of Anthropic. Ran safety and policy operations at OpenAI before co-leading the 2021 split. She built Anthropic's company operations.",
+ s:["UC Santa Cruz"],c:[["Stripe","2013–2018"],["OpenAI","2018–2020"],["Anthropic","2021–"]],
+ pr:["Claude"]},
+{id:"yudkowsky",n:"Eliezer Yudkowsky",b:"S",wiki:W("Eliezer_Yudkowsky"),
+ bio:"Self-taught founder of the AI alignment field and the original 'doomer'. Co-author of If Anyone Builds It, Everyone Dies. Roose found him quirky and funny in person, though he still believes humanity will probably not survive AGI. He influenced many lab founders, both directly and through rationalist circles.",
+ s:[],c:[["MIRI (Machine Intelligence Research Institute)","2000–"]],
+ pr:["AI alignment research","Singularity Summit"]},
+{id:"toner",n:"Helen Toner",b:"I",wiki:W("Helen_Toner"),
+ bio:"AI governance researcher. As an OpenAI board member, she voted to remove Altman in November 2023 and left the board after he returned.",
+ s:["University of Melbourne","Georgetown University"],c:[["Open Philanthropy","~2015–2017"],["CSET (Georgetown)","2019–"],["OpenAI","2021–2023 (board)"]],
+ pr:["2023 OpenAI board crisis"]},
+{id:"murati",n:"Mira Murati",b:"I",wiki:W("Mira_Murati"),
+ bio:"Ran OpenAI's technical product launches, including ChatGPT and GPT-4, and was briefly interim CEO during the 2023 crisis. Left in 2024 and founded Thinking Machines Lab.",
+ s:["Colby College","Dartmouth College"],c:[["Zodiac Aerospace","2012–2013"],["Tesla","2013–2016"],["Leap Motion","2016–2018"],["OpenAI","2018–2024"],["Thinking Machines Lab","2025–"]],
+ pr:["ChatGPT","GPT-4","2023 OpenAI board crisis"]},
+{id:"nadella",n:"Satya Nadella",b:"I",wiki:W("Satya_Nadella"),
+ bio:"Microsoft CEO who made the company OpenAI's main investor and compute supplier. During the 2023 crisis he offered to hire Altman and OpenAI's staff. Microsoft features in the Atlantic excerpt, and the Bing/Sydney episode with Roose happened on its watch.",
+ s:["Manipal Institute of Technology","University of Wisconsin–Milwaukee","University of Chicago Booth"],c:[["Sun Microsystems","~1990–1992"],["Microsoft","1992–"]],
+ pr:["Microsoft–OpenAI partnership","Bing Chat / Sydney","2023 OpenAI board crisis"]},
+{id:"pichai",n:"Sundar Pichai",b:"I",wiki:W("Sundar_Pichai"),
+ bio:"Google and Alphabet CEO who led Google's urgent catch-up after ChatGPT. He merged Google Brain and DeepMind in 2023 and backed Bard, which became Gemini.",
+ s:["IIT Kharagpur","Stanford University","Wharton (UPenn)"],c:[["Applied Materials","~1995"],["McKinsey & Company","~2002–2004"],["Google","2004–"]],
+ pr:["Gemini","Google Brain–DeepMind merger (2023)"]},
+{id:"legg",n:"Shane Legg",b:"I",wiki:W("Shane_Legg"),
+ bio:"DeepMind co-founder and chief AGI scientist. Helped popularize the term 'AGI' in the early 2000s and has long forecast a roughly 50% chance of AGI by about 2028.",
+ s:["University of Waikato","University of Auckland","University of Lugano (IDSIA)"],c:[["Webmind","~1999–2001"],["DeepMind / Google DeepMind","2010–"]],
+ pr:["AlphaGo","RLHF","Singularity Summit"]},
+{id:"suleyman",n:"Mustafa Suleyman",b:"I",wiki:W("Mustafa_Suleyman"),
+ bio:"DeepMind co-founder who led applied AI and policy work. Later co-founded Inflection AI, then moved to Microsoft as CEO of Microsoft AI.",
+ s:["University of Oxford"],c:[["DeepMind / Google DeepMind","2010–2019"],["Google","2019–2022"],["Inflection AI","2022–2024"],["Microsoft","2024–"]],
+ pr:["Microsoft Copilot"]},
+{id:"graham",n:"Logan Graham",b:"S",wiki:"",
+ bio:"Leads Anthropic's Frontier Red Team, which tests models for catastrophic misuse. The Vanity Fair excerpt describes his team's last-minute 'uplift trial' in February 2025, which tested whether Claude 3.7 Sonnet crossed the ASL-3 bio-risk threshold. Bio details need verification.",
+ s:["University of Oxford ?"],c:[["Anthropic","~2022– ?"]],
+ pr:["Frontier Red Team","Responsible Scaling Policy (ASL levels)","Claude"]},
+{id:"hinton",n:"Geoffrey Hinton",b:"I",wiki:W("Geoffrey_Hinton"),
+ bio:"Deep-learning pioneer, Sutskever's doctoral adviser and co-author of AlexNet. Won the 2024 Nobel Prize in Physics. He left Google in 2023 so he could speak freely about AI risk.",
+ s:["University of Cambridge","University of Edinburgh"],c:[["Carnegie Mellon University","1982–1987"],["University of Toronto","1987–"],["DNNresearch","2012–2013"],["Google Brain","2013–2023"]],
+ pr:["AlexNet","Backpropagation"]},
+{id:"leike",n:"Jan Leike",b:"I",wiki:W("Jan_Leike"),
+ bio:"Alignment researcher who co-led OpenAI's Superalignment team with Sutskever. Resigned in 2024, saying publicly that safety had taken a back seat to shiny products, and joined Anthropic.",
+ s:["University of Freiburg","Australian National University"],c:[["DeepMind / Google DeepMind","2016–2021"],["OpenAI","2021–2024"],["Anthropic","2024–"]],
+ pr:["Superalignment","RLHF"]},
+{id:"olah",n:"Chris Olah",b:"I",wiki:W("Chris_Olah"),
+ bio:"Anthropic co-founder who pioneered mechanistic interpretability, the work of reverse-engineering what happens inside neural networks. A college dropout and Thiel Fellow.",
+ s:["University of Toronto"],c:[["Google Brain","~2014–2018"],["OpenAI","2018–2020"],["Anthropic","2021–"]],
+ pr:["Mechanistic interpretability","Claude","Concrete Problems in AI Safety (2016)"]},
+{id:"clark",n:"Jack Clark",b:"I",wiki:"",
+ bio:"Former tech journalist who ran policy at OpenAI and co-founded Anthropic, where he leads policy. Writes the Import AI newsletter.",
+ s:["University of East Anglia"],c:[["Bloomberg","~2014–2016"],["OpenAI","2016–2020"],["Anthropic","2021–"]],
+ pr:["GPT-2","Claude"]},
+{id:"trump",n:"Donald Trump",b:"S",wiki:W("Donald_Trump"),
+ bio:"US President during the book's later chapters. His administration pushed the labs to make their models available for military use for 'all lawful purposes' and preferred the term 'superintelligence'. Roose describes Anthropic resisting this political pressure.",
+ s:["Fordham University","Wharton (UPenn)"],c:[["Trump Organization","1971–"],["White House","2017–2021, 2025–"]],
+ pr:["Pentagon AI use dispute","Stargate"]},
+{id:"gates",n:"Bill Gates",b:"S",wiki:W("Bill_Gates"),
+ bio:"Microsoft co-founder. In the book he advises OpenAI to spend less time on deep learning, prioritize neurosymbolic AI, and treats GPT-1 as a toy. He was later converted by GPT-4.",
+ s:["Harvard University"],c:[["Microsoft","1975–"],["Gates Foundation","2000–"]],
+ pr:["Microsoft–OpenAI partnership"]},
+{id:"bostrom",n:"Nick Bostrom",b:"S",wiki:W("Nick_Bostrom"),
+ bio:"Philosopher whose 2014 book Superintelligence inspired Musk and Altman and shaped the early AI-safety debate. Founded Oxford's Future of Humanity Institute.",
+ s:["University of Gothenburg","Stockholm University","King's College London","London School of Economics"],c:[["Yale University","2000–2002"],["University of Oxford (FHI)","2005–2024"]],
+ pr:["Superintelligence (book, 2014)"]},
+{id:"kurzweil",n:"Ray Kurzweil",b:"S",wiki:W("Ray_Kurzweil"),
+ bio:"Inventor and futurist who predicted in 1999 that AGI would arrive by 2029. The book treats that forecast as apparently on track.",
+ s:["MIT"],c:[["Kurzweil Computer Products","1974–1980"],["Kurzweil Music Systems","1982–1990"],["Google","2012–"]],
+ pr:["Singularity forecasts"]},
+{id:"shazeer",n:"Noam Shazeer",b:"I",wiki:W("Noam_Shazeer"),
+ bio:"Co-author of 'Attention Is All You Need' (2017), the paper that introduced the Transformer. Left Google to found Character.AI and returned in 2024 through a licensing deal to co-lead Gemini.",
+ s:["Duke University"],c:[["Google","2000–2021"],["Character.AI","2021–2024"],["Google","2024–"]],
+ pr:["Transformer","Gemini"]},
+{id:"brin",n:"Sergey Brin",b:"I",wiki:W("Sergey_Brin"),
+ bio:"Google co-founder who came back to hands-on work on Gemini during Google's catch-up effort.",
+ s:["University of Maryland","Stanford University"],c:[["Google","1998–"]],
+ pr:["Gemini"]},
+{id:"zuckerberg",n:"Mark Zuckerberg",b:"I",wiki:W("Mark_Zuckerberg"),
+ bio:"Meta CEO who championed open-weight Llama models. In 2025 he made pay offers above $100M to poach top researchers, which reviews of the book mention.",
+ s:["Harvard University"],c:[["Meta (Facebook)","2004–"]],
+ pr:["Llama","Meta Superintelligence Labs"]},
+{id:"christiano",n:"Paul Christiano",b:"I",wiki:W("Paul_Christiano_(researcher)"),
+ bio:"Alignment theorist and co-inventor of RLHF, the technique that made chatbots like ChatGPT usable. Ran OpenAI's alignment team, then founded ARC and later led safety at the US AI Safety Institute.",
+ s:["MIT","UC Berkeley"],c:[["OpenAI","2017–2021"],["Alignment Research Center","2021–2024"],["US AI Safety Institute","2024–"]],
+ pr:["RLHF","AI alignment research","Concrete Problems in AI Safety (2016)"]},
+{id:"kaiser",n:"Łukasz Kaiser",b:"I",wiki:"",img:"https://www.version2.dk/sites/mi/files/styles/original/public/2023-09/kaiser.jpg?itok=1uqIKxbn",
+ bio:"Polish computer scientist and AI researcher whose work connects the Transformer breakthrough at Google Brain to OpenAI's modern reasoning-model program. Kaiser co-authored the 2017 paper 'Attention Is All You Need,' helped build Tensor2Tensor and TensorFlow research infrastructure, and later contributed to ChatGPT, GPT-4, GPT-5, o1 and o3. His appearance in The AGI Chronicles has not yet been verified, so this entry is marked Inferred.",
+ s:["University of Wrocław","RWTH Aachen University"],c:[["RWTH Aachen University","2003–2010"],["CNRS","2010–"],["Google Brain","2013–2021"],["OpenAI","2021–2026"]],
+ pr:["Transformer","TensorFlow","Tensor2Tensor","Universal Transformer","Reformer","ChatGPT","GPT-4","GPT-5","o1","o3"]},
+{id:"verdon",n:"Guillaume Verdon",b:"I",wiki:W("Guillaume_Verdon"),
+ bio:"Quantum physicist who, as the pseudonymous 'Beff Jezos', founded effective accelerationism (e/acc), the counterweight to the doomers in the book's San Francisco scenes.",
+ s:["McGill University","University of Waterloo ?"],c:[["Alphabet (X / quantum)","~2019–2022 ?"],["Extropic","2022–"]],
+ pr:["Effective accelerationism (e/acc)"]}
+];
+
+/* Connections: [personA, personB, type, explanation, [related wiki titles]] — general knowledge unless noted "(book)". */
+const REL = [
+["altman","musk","Rivals","Co-founded OpenAI together in 2015. Split in 2018 over control and direction; Musk later founded rival xAI and sued OpenAI and Altman. The book describes deep mutual antipathy (book).",["OpenAI","Musk_v._OpenAI"]],
+["altman","brockman","Co-founders","Built OpenAI together from 2015. When the board fired Altman in Nov 2023, Brockman quit in protest the same day, and both returned days later.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["altman","sutskever","Co-founders → rupture","OpenAI co-founders. Sutskever was on the board majority that fired Altman in Nov 2023, then publicly regretted it and backed his return. He left OpenAI in 2024.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["altman","amodei","Rivals","Amodei ran research under Altman at OpenAI until leaving in late 2020 to found Anthropic. The book describes a feud in which the two cannot stand each other (book).",["Anthropic","OpenAI"]],
+["altman","hassabis","Rivals","Leaders of competing frontier labs. OpenAI was founded partly as a counterweight to Google-owned DeepMind, and the book reports Hassabis cannot stand Altman (book).",["Google_DeepMind","OpenAI"]],
+["altman","nadella","Partners","Microsoft is OpenAI's largest investor and cloud supplier. During the 2023 firing, Nadella offered Altman and OpenAI staff jobs at Microsoft, which helped force Altman's return.",["Microsoft_and_OpenAI","Removal_of_Sam_Altman_from_OpenAI"]],
+["altman","toner","Board conflict","Toner sat on the OpenAI board that fired Altman in Nov 2023, citing concerns about his candor. She left the board after he was reinstated.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["altman","murati","Colleagues","Murati was Altman's CTO and ran ChatGPT and GPT-4 launches. She was named interim CEO when he was fired, then supported his return; she left OpenAI in 2024.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["altman","gates","Skeptic → backer","Gates was an early skeptic of OpenAI's deep-learning bet (book). Microsoft, which he co-founded, became OpenAI's main backer, and GPT-4 changed his mind.",["Microsoft_and_OpenAI"]],
+["altman","bostrom","Influence","Bostrom's 2014 book Superintelligence shaped Altman's early thinking about AI risk around OpenAI's founding (book).",["Superintelligence:_Paths,_Dangers,_Strategies"]],
+["altman","yudkowsky","Influence → critic","Altman has credited Yudkowsky with getting many people, himself included, interested in AGI. Yudkowsky is one of OpenAI's harshest critics.",["AI_alignment"]],
+["altman","trump","Political","Altman appeared with Trump at the January 2025 White House announcement of the Stargate AI-infrastructure venture.",["Stargate_LLC"]],
+["altman","zuckerberg","Rivals","In 2025, Meta offered OpenAI researchers packages reportedly above $100M to join Meta Superintelligence Labs. Altman publicly criticized the poaching.",["Meta_Superintelligence_Labs"]],
+["altman","suleyman","Partners / rivals","Suleyman runs Microsoft AI, which depends on OpenAI models but is building its own frontier models.",["Microsoft_and_OpenAI"]],
+["amodei","daniela","Siblings, co-founders","Brother and sister. Both left OpenAI in 2020–21 and co-founded Anthropic; Dario is CEO, Daniela president.",["Anthropic"]],
+["amodei","kaplan","Co-authors, co-founders","Co-authored the 2020 scaling-laws paper at OpenAI and co-founded Anthropic. Both were consulted on the Claude 3.7 bio-risk decision (book).",["Neural_scaling_law","Anthropic"]],
+["amodei","clark","Co-founders","Worked together on OpenAI's staged GPT-2 release and co-founded Anthropic, where Clark leads policy.",["GPT-2","Anthropic"]],
+["amodei","olah","Long-time colleagues","Worked together at Google Brain and OpenAI, co-authored 'Concrete Problems in AI Safety' (2016), and co-founded Anthropic.",["Anthropic"]],
+["amodei","christiano","Co-authors","Co-authored 'Concrete Problems in AI Safety' (2016) and the 2017 paper on deep RL from human preferences, the basis of RLHF.",["Reinforcement_learning_from_human_feedback"]],
+["amodei","brockman","Colleagues → split","OpenAI colleagues. Amodei objected to the 2017 'countries plan' Brockman co-authored, one of the disputes behind his departure (book).",["OpenAI"]],
+["amodei","sutskever","Colleagues","Fellow scaling believers at OpenAI; worked together on GPT-2 and GPT-3. The countries plan was a point of conflict (book).",["GPT-3"]],
+["amodei","radford","Colleagues","Amodei's team scaled Radford's GPT-1 into GPT-2 and GPT-3.",["GPT-2","GPT-3"]],
+["amodei","graham","Colleagues","Graham's Frontier Red Team escalated its Claude 3.7 Sonnet bio-uplift results to Amodei for the ASL-3 decision (book).",["Claude_(language_model)"]],
+["amodei","trump","Political conflict","The book describes Anthropic resisting administration pressure on AI policy and military use (book).",["Anthropic"]],
+["amodei","hassabis","Rivals","Leaders of competing safety-focused frontier labs.",["Google_DeepMind","Anthropic"]],
+["amodei","leike","Colleagues","Leike joined Anthropic in 2024 after resigning from OpenAI's Superalignment team.",["Anthropic"]],
+["amodei","musk","Distant","Amodei joined OpenAI in 2016 while Musk was co-chair and funder. They had no major direct collaboration.",["OpenAI"]],
+["hassabis","legg","Co-founders","Met as researchers at UCL's Gatsby Unit and co-founded DeepMind in 2010 with Suleyman.",["Google_DeepMind"]],
+["hassabis","suleyman","Co-founders","Childhood acquaintances from London who co-founded DeepMind. Suleyman left in 2019 and now leads a competing lab at Microsoft.",["Google_DeepMind"]],
+["hassabis","pichai","Boss / lab head","Pichai merged Google Brain with DeepMind in 2023 under Hassabis to accelerate Gemini.",["Google_DeepMind","Gemini_(chatbot)"]],
+["hassabis","brin","Google colleagues","Google acquired DeepMind in 2014. Brin later returned to work on Gemini, which Hassabis's group leads.",["Google_DeepMind"]],
+["hassabis","musk","Investor → rival","Musk was an early DeepMind investor. His alarm at Google owning DeepMind was a key motive for co-founding OpenAI.",["Google_DeepMind","OpenAI"]],
+["hassabis","shazeer","Colleagues","Shazeer co-leads Gemini technically inside Google DeepMind.",["Gemini_(chatbot)"]],
+["hassabis","hinton","Peers","Leading deep-learning figures at Google; both won Nobel Prizes in 2024 (Hassabis in Chemistry, Hinton in Physics).",["2024_Nobel_Prize_in_Physics"]],
+["hassabis","yudkowsky","Early network","Hassabis and Legg met investor Peter Thiel at Yudkowsky's Singularity Summit in 2010, where they pitched DeepMind.",["Singularity_Summit"]],
+["musk","brockman","Co-founders","Co-founded OpenAI. Their 2017 emails show a fight over control and a for-profit shift, which ended with Musk leaving.",["Musk_v._OpenAI"]],
+["musk","sutskever","Recruiter","Musk personally recruited Sutskever away from Google to be OpenAI's chief scientist in 2015.",["OpenAI"]],
+["musk","bostrom","Influence","Musk publicly promoted Bostrom's Superintelligence in 2014, and the book shaped his view of AI as an existential threat.",["Superintelligence:_Paths,_Dangers,_Strategies"]],
+["musk","radford","Dismissive boss","According to the book, Musk derided Radford's early pre-Transformer chatbot as crap, which contributed to Radford nearly quitting (book).",["GPT-1"]],
+["musk","trump","Political ally","Major Trump backer in 2024 who led the DOGE effort in 2025. They later had a public falling-out.",["Department_of_Government_Efficiency"]],
+["musk","pichai","Critic","Musk attacked Google's Gemini on X over its biased image outputs (book).",["Gemini_(chatbot)"]],
+["sutskever","hinton","Student / adviser","Hinton supervised Sutskever's PhD. With Krizhevsky they built AlexNet in 2012 and sold their startup DNNresearch to Google.",["AlexNet"]],
+["sutskever","toner","Board allies","Both were on the OpenAI board majority that voted to remove Altman in Nov 2023.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["sutskever","murati","Colleagues","Senior OpenAI technical leaders; both were central to the 2023 board crisis.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["sutskever","leike","Co-leads","Co-led OpenAI's Superalignment team from 2023 and both left in May 2024.",["OpenAI"]],
+["sutskever","radford","Colleagues","Sutskever championed the GPT research line that Radford started.",["GPT-1"]],
+["sutskever","brockman","Co-founders","OpenAI co-founders and co-authors of the 2017 countries plan (book). The 2023 board vote removed Brockman as chair.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["brockman","daniela","Colleagues","Overlapped at Stripe, where Brockman was CTO, then worked together at OpenAI.",["Stripe,_Inc."]],
+["brockman","murati","Colleagues","Senior OpenAI leaders through the ChatGPT era.",["OpenAI"]],
+["kaplan","graham","Colleagues","Kaplan was consulted on the Frontier Red Team's Claude 3.7 bio-uplift findings (book).",["Claude_(language_model)"]],
+["kaplan","daniela","Co-founders","Anthropic co-founders.",["Anthropic"]],
+["kaplan","clark","Co-founders","Anthropic co-founders; earlier GPT-3 co-authors at OpenAI.",["GPT-3"]],
+["daniela","clark","Co-founders","Anthropic co-founders.",["Anthropic"]],
+["olah","clark","Co-founders","Anthropic co-founders.",["Anthropic"]],
+["olah","christiano","Co-authors","Co-authors of 'Concrete Problems in AI Safety' (2016).",["AI_safety"]],
+["yudkowsky","bostrom","Intellectual allies","Founders of the AI-existential-risk movement. They co-wrote 'The Ethics of Artificial Intelligence' (2014).",["Existential_risk_from_artificial_intelligence"]],
+["yudkowsky","christiano","Debate partners","Christiano worked with MIRI early on and later debated Yudkowsky publicly on how fast AI takeoff would be.",["AI_alignment"]],
+["yudkowsky","legg","Early network","Legg spoke at Yudkowsky's Singularity Summit, where DeepMind's founders met Peter Thiel.",["Singularity_Summit"]],
+["yudkowsky","verdon","Ideological opponents","Opposite poles of the book's San Francisco scene: the leading doomer versus the leader of the accelerationists.",["Effective_accelerationism"]],
+["yudkowsky","kurzweil","Fellow futurists","Both come from the singularity movement. Kurzweil is an optimist, Yudkowsky a pessimist.",["Technological_singularity"]],
+["toner","murati","Crisis","Toner's board named Murati interim CEO when it fired Altman.",["Removal_of_Sam_Altman_from_OpenAI"]],
+["nadella","gates","Microsoft","Nadella succeeded Gates's generation at Microsoft. Gates advised on the OpenAI bet and tested GPT-4 in 2022.",["Microsoft_and_OpenAI"]],
+["nadella","suleyman","Boss","Nadella hired Suleyman and most of Inflection's team in 2024 to run Microsoft AI.",["Inflection_AI"]],
+["pichai","brin","Google","Brin co-founded Google; Pichai runs it. Both drove the post-ChatGPT catch-up.",["Google"]],
+["pichai","shazeer","Google","Pichai's Google paid a reported ~$2.7B licensing deal to bring Shazeer back from Character.AI in 2024.",["Character.ai"]],
+["brin","shazeer","Google","Long-time Google colleagues, back together on Gemini.",["Gemini_(chatbot)"]],
+["brin","kurzweil","Google","Kurzweil joined Google in 2012 to work on language understanding.",["Ray_Kurzweil"]],
+["legg","suleyman","Co-founders","DeepMind co-founders.",["Google_DeepMind"]],
+["legg","leike","Academic lineage","Both are PhD students of Marcus Hutter. They worked together at DeepMind and co-authored the 2017 RLHF paper.",["Marcus_Hutter"]],
+["leike","christiano","Co-authors","Co-authors of the 2017 RLHF paper; each led alignment at OpenAI in turn.",["Reinforcement_learning_from_human_feedback"]],
+["hinton","shazeer","Google","Google colleagues during the Brain era, when the Transformer was invented.",["Google_Brain"]],
+["bostrom","kurzweil","Futurists","Leading thinkers on superintelligence and the singularity.",["Technological_singularity"]],
+["zuckerberg","musk","Rivals","Long-running public feud; competing AI bets (Llama and Grok).",["Llama_(language_model)"]],
+["trump","zuckerberg","Political","Meta aligned more closely with the administration in 2025.",["Meta_Platforms"]],
+["kaiser","shazeer","Co-authors / Google Brain","Kaiser and Shazeer were among the eight authors of the 2017 paper 'Attention Is All You Need,' which introduced the Transformer architecture. They also overlapped at Google Brain.",["Attention_Is_All_You_Need","Transformer_(deep_learning_architecture)"]],
+["kaiser","altman","OpenAI researcher / lab leader","Kaiser joined OpenAI in 2021 and contributed to ChatGPT, GPT-4, GPT-5 and the o1/o3 reasoning-model line during Altman's leadership.",["OpenAI","ChatGPT","GPT-4"]],
+["kaiser","sutskever","OpenAI colleagues","Kaiser and Sutskever overlapped at OpenAI during the ChatGPT and GPT-4 period. Sutskever was chief scientist while Kaiser worked on frontier models and later reasoning models.",["OpenAI","GPT-4"]]
+];
+
+const PROJ = {
+"ChatGPT":["OpenAI","2022","Consumer chatbot that set off the AGI race.","ChatGPT"],
+"GPT-1":["OpenAI","2018","First generative pre-trained Transformer.","GPT-1"],
+"GPT-2":["OpenAI","2019","Its staged release over misuse fears set the first safety precedent.","GPT-2"],
+"GPT-3":["OpenAI","2020","175B-parameter model that confirmed scaling.","GPT-3"],
+"GPT-4":["OpenAI","2023","Frontier model behind Microsoft's AI push.","GPT-4"],
+"CLIP":["OpenAI","2021","Model linking images and text.",""],
+"Scaling laws":["OpenAI","2020","Showed loss falls predictably with compute, data and model size.","Neural_scaling_law"],
+"Countries plan (2017)":["OpenAI","2017","Proposal to sell future AGI rights to governments, incl. the US, China and Russia; it alarmed Amodei.",""],
+"OpenAI nonprofit / capped-profit structure":["OpenAI","2015 / 2019","Governance structure at the center of the Musk split and the 2023 crisis.",""],
+"2023 OpenAI board crisis":["OpenAI","Nov 2023","Altman fired and reinstated within days.","Removal_of_Sam_Altman_from_OpenAI"],
+"Superalignment":["OpenAI","2023–2024","Team aligning superhuman AI; dissolved after Sutskever and Leike left.",""],
+"RLHF":["OpenAI","2017–","Reinforcement learning from human feedback.","Reinforcement_learning_from_human_feedback"],
+"Concrete Problems in AI Safety (2016)":["Google Brain","2016","Influential safety research agenda by Amodei, Olah, Christiano and others.",""],
+"Claude":["Anthropic","2023–","Anthropic's model family.","Claude_(language_model)"],
+"Responsible Scaling Policy (ASL levels)":["Anthropic","2023–","Safety levels that gate deployment according to model risk.",""],
+"Frontier Red Team":["Anthropic","~2023–","Tests for CBRN and cyber misuse; ran the Claude 3.7 uplift trial.",""],
+"Mechanistic interpretability":["Anthropic","2014–","Reverse-engineering what happens inside neural networks.","Mechanistic_interpretability"],
+"AlphaGo":["DeepMind / Google DeepMind","2016","Beat Lee Sedol at Go.","AlphaGo"],
+"AlphaFold":["DeepMind / Google DeepMind","2020","Solved protein structure prediction; Nobel 2024.","AlphaFold"],
+"Gemini":["Google","2023–","Google's flagship model, built in the catch-up after ChatGPT.","Gemini_(chatbot)"],
+"Google Brain–DeepMind merger (2023)":["Google","2023","Formed Google DeepMind.","Google_DeepMind"],
+"Transformer":["Google","2017","'Attention Is All You Need', the architecture behind all GPTs.","Transformer_(deep_learning_architecture)"],
+"TensorFlow":["Google Brain","2015–","Open-source machine-learning platform to which Kaiser contributed.","TensorFlow"],
+"Tensor2Tensor":["Google Brain","2017–","Google Brain library for training deep-learning models across tasks and modalities.","Tensor2Tensor"],
+"Universal Transformer":["Google Brain","2018","Transformer variant that applies recurrent refinement and was co-authored by Kaiser.","Universal_Transformer"],
+"Reformer":["Google Brain","2020","Efficient Transformer variant using locality-sensitive hashing and reversible layers.","Reformer_(machine_learning)"],
+"GPT-5":["OpenAI","2025–","OpenAI frontier-model generation to which Kaiser has publicly attributed contributions.","GPT-5"],
+"o1":["OpenAI","2024","OpenAI reasoning-model series designed to spend more computation before answering.","OpenAI_o1"],
+"o3":["OpenAI","2025","Successor reasoning-model series developed at OpenAI.","OpenAI_o3"],
+"AlexNet":["University of Toronto","2012","Image-recognition breakthrough that launched the deep-learning era.","AlexNet"],
+"Seq2seq":["Google Brain","2014","Sequence-to-sequence learning used for machine translation.","Seq2seq"],
+"Backpropagation":["Carnegie Mellon University","1986","Training algorithm for neural networks.","Backpropagation"],
+"Microsoft–OpenAI partnership":["Microsoft","2019–","Multibillion-dollar investment and compute deal.","Microsoft_and_OpenAI"],
+"Bing Chat / Sydney":["Microsoft","2023","Roose's notorious conversation with the Sydney chatbot.","Sydney_(Microsoft)"],
+"Microsoft Copilot":["Microsoft","2023–","Microsoft's AI assistant.","Microsoft_Copilot"],
+"Grok":["xAI","2023–","xAI's chatbot.","Grok_(chatbot)"],
+"Llama":["Meta (Facebook)","2023–","Open-weight model family.","Llama_(language_model)"],
+"Meta Superintelligence Labs":["Meta (Facebook)","2025–","Meta's AGI lab, known for $100M+ hiring offers.",""],
+"AI alignment research":["MIRI (Machine Intelligence Research Institute)","2000–","The field of making AI pursue intended goals.","AI_alignment"],
+"Singularity Summit":["MIRI (Machine Intelligence Research Institute)","2006–2012","Conference where DeepMind's founders met investor Peter Thiel (2010).","Singularity_Summit"],
+"Superintelligence (book, 2014)":["University of Oxford (FHI)","2014","Bostrom's book on existential risk from AI.","Superintelligence:_Paths,_Dangers,_Strategies"],
+"Singularity forecasts":["—","1999–","Kurzweil's forecast of AGI by 2029.","The_Singularity_Is_Near"],
+"Effective accelerationism (e/acc)":["—","2022–","Pro-acceleration movement.","Effective_accelerationism"],
+"Stargate":["White House","2025","$500B AI-infrastructure venture announced at the White House with OpenAI, SoftBank and Oracle.","Stargate_LLC"],
+"Pentagon AI use dispute":["White House","2025–2026","Government push for military use of AI for 'all lawful purposes'.",""]
+};
+/* Logo domains for companies & schools */
+const DOM = {"OpenAI":"openai.com","Anthropic":"anthropic.com","DeepMind / Google DeepMind":"deepmind.google","Google":"google.com","Google Brain":"research.google","Microsoft":"microsoft.com","Y Combinator":"ycombinator.com","Baidu":"baidu.com","Isomorphic Labs":"isomorphiclabs.com","X.com / PayPal":"paypal.com","SpaceX":"spacex.com","Tesla":"tesla.com","xAI":"x.ai","Safe Superintelligence":"ssi.inc","Stripe":"stripe.com","Johns Hopkins University":"jhu.edu","MIRI (Machine Intelligence Research Institute)":"intelligence.org","Open Philanthropy":"openphilanthropy.org","CSET (Georgetown)":"cset.georgetown.edu","Leap Motion":"ultraleap.com","Thinking Machines Lab":"thinkingmachines.ai","Applied Materials":"appliedmaterials.com","McKinsey & Company":"mckinsey.com","Inflection AI":"inflection.ai","Carnegie Mellon University":"cmu.edu","University of Toronto":"utoronto.ca","Bloomberg":"bloomberg.com","White House":"whitehouse.gov","Gates Foundation":"gatesfoundation.org","Yale University":"yale.edu","University of Oxford (FHI)":"ox.ac.uk","Character.AI":"character.ai","Meta (Facebook)":"meta.com","Alignment Research Center":"alignment.org","US AI Safety Institute":"nist.gov","Alphabet (X / quantum)":"abc.xyz","Extropic":"extropic.ai","Trump Organization":"trump.com","Zodiac Aerospace":"safran-group.com","Sun Microsystems":"oracle.com","CNRS":"cnrs.fr","RWTH Aachen University":"rwth-aachen.de",
+"Stanford University":"stanford.edu","Caltech":"caltech.edu","Princeton University":"princeton.edu","University of Cambridge":"cam.ac.uk","University College London":"ucl.ac.uk","Queen's University":"queensu.ca","University of Pennsylvania":"upenn.edu","Open University of Israel":"openu.ac.il","Harvard University":"harvard.edu","MIT":"mit.edu","Olin College":"olin.edu","UC Santa Cruz":"ucsc.edu","University of Melbourne":"unimelb.edu.au","Georgetown University":"georgetown.edu","Colby College":"colby.edu","Dartmouth College":"dartmouth.edu","Manipal Institute of Technology":"manipal.edu","University of Wisconsin–Milwaukee":"uwm.edu","University of Chicago Booth":"chicagobooth.edu","IIT Kharagpur":"iitkgp.ac.in","Wharton (UPenn)":"wharton.upenn.edu","University of Waikato":"waikato.ac.nz","University of Auckland":"auckland.ac.nz","University of Lugano (IDSIA)":"usi.ch","University of Oxford":"ox.ac.uk","University of Edinburgh":"ed.ac.uk","University of Freiburg":"uni-freiburg.de","Australian National University":"anu.edu.au","University of East Anglia":"uea.ac.uk","Fordham University":"fordham.edu","University of Gothenburg":"gu.se","Stockholm University":"su.se","King's College London":"kcl.ac.uk","London School of Economics":"lse.ac.uk","Duke University":"duke.edu","University of Maryland":"umd.edu","UC Berkeley":"berkeley.edu","McGill University":"mcgill.ca","University of Waterloo":"uwaterloo.ca","University of Wrocław":"uwr.edu.pl"};
+/* Wikipedia titles for companies & schools ("" = Wikipedia search) */
+const WK = {"OpenAI":"OpenAI","Anthropic":"Anthropic","DeepMind / Google DeepMind":"Google_DeepMind","Google":"Google","Google Brain":"Google_Brain","Microsoft":"Microsoft","Y Combinator":"Y_Combinator","Loopt":"Loopt","Baidu":"Baidu","Bullfrog Productions":"Bullfrog_Productions","Lionhead Studios":"Lionhead_Studios","Elixir Studios":"Elixir_Studios","Isomorphic Labs":"Isomorphic_Labs","Zip2":"Zip2","X.com / PayPal":"PayPal","SpaceX":"SpaceX","Tesla":"Tesla,_Inc.","xAI":"XAI_(company)","DNNresearch":"","Safe Superintelligence":"Safe_Superintelligence_Inc.","Stripe":"Stripe,_Inc.","indico":"","Johns Hopkins University":"Johns_Hopkins_University","MIRI (Machine Intelligence Research Institute)":"Machine_Intelligence_Research_Institute","Open Philanthropy":"Open_Philanthropy","CSET (Georgetown)":"Center_for_Security_and_Emerging_Technology","Zodiac Aerospace":"Zodiac_Aerospace","Leap Motion":"Leap_Motion","Thinking Machines Lab":"Thinking_Machines_Lab","Sun Microsystems":"Sun_Microsystems","Applied Materials":"Applied_Materials","McKinsey & Company":"McKinsey_%26_Company","Webmind":"","Inflection AI":"Inflection_AI","Carnegie Mellon University":"Carnegie_Mellon_University","University of Toronto":"University_of_Toronto","Bloomberg":"Bloomberg_L.P.","Trump Organization":"The_Trump_Organization","White House":"White_House","Gates Foundation":"Gates_Foundation","Yale University":"Yale_University","University of Oxford (FHI)":"Future_of_Humanity_Institute","Kurzweil Computer Products":"Kurzweil_Computer_Products","Kurzweil Music Systems":"Kurzweil_Music_Systems","Character.AI":"Character.ai","Meta (Facebook)":"Meta_Platforms","Alignment Research Center":"Alignment_Research_Center","US AI Safety Institute":"AI_Safety_Institute","Alphabet (X / quantum)":"Alphabet_Inc.","Extropic":"","CNRS":"French_National_Centre_for_Scientific_Research","RWTH Aachen University":"RWTH_Aachen_University",
+"Stanford University":"Stanford_University","Caltech":"California_Institute_of_Technology","Princeton University":"Princeton_University","University of Cambridge":"University_of_Cambridge","University College London":"University_College_London","Queen's University":"Queen%27s_University_at_Kingston","University of Pennsylvania":"University_of_Pennsylvania","Open University of Israel":"Open_University_of_Israel","Harvard University":"Harvard_University","MIT":"Massachusetts_Institute_of_Technology","Olin College":"Olin_College_of_Engineering","UC Santa Cruz":"University_of_California,_Santa_Cruz","University of Melbourne":"University_of_Melbourne","Georgetown University":"Georgetown_University","Colby College":"Colby_College","Dartmouth College":"Dartmouth_College","Manipal Institute of Technology":"Manipal_Institute_of_Technology","University of Wisconsin–Milwaukee":"University_of_Wisconsin%E2%80%93Milwaukee","University of Chicago Booth":"University_of_Chicago_Booth_School_of_Business","IIT Kharagpur":"IIT_Kharagpur","Wharton (UPenn)":"Wharton_School_of_the_University_of_Pennsylvania","University of Waikato":"University_of_Waikato","University of Auckland":"University_of_Auckland","University of Lugano (IDSIA)":"Dalle_Molle_Institute_for_Artificial_Intelligence_Research","University of Oxford":"University_of_Oxford","University of Edinburgh":"University_of_Edinburgh","University of Freiburg":"University_of_Freiburg","Australian National University":"Australian_National_University","University of East Anglia":"University_of_East_Anglia","Fordham University":"Fordham_University","University of Gothenburg":"University_of_Gothenburg","Stockholm University":"Stockholm_University","King's College London":"King%27s_College_London","London School of Economics":"London_School_of_Economics","Duke University":"Duke_University","University of Maryland":"University_of_Maryland,_College_Park","UC Berkeley":"University_of_California,_Berkeley","McGill University":"McGill_University","University of Waterloo":"University_of_Waterloo","University of Wrocław":"University_of_Wrocław"};
+
+/* ---------- indexes & exposure ---------- */
+const byId = Object.fromEntries(P.map(p=>[p.id,p]));
+const RANK = Object.fromEntries(P.map((p,i)=>[p.id,i+1]));
+const EXP = id => (P.length+1)-RANK[id];
+const COMP={}, SCH={}, PRJ={};
+P.forEach(p=>{
+  p.c.forEach(([c,y])=>{const a=(COMP[c]=COMP[c]||[]); if(!a.some(e=>e[0]===p.id&&e[1]===y)) a.push([p.id,y]);});
+  p.s.forEach(s=>{const k=s.replace(" ?","");(SCH[k]=SCH[k]||[]).push(p.id);});
+  p.pr.forEach(r=>{(PRJ[r]=PRJ[r]||[]).push(p.id);});
+});
+Object.keys(PROJ).forEach(k=>{if(!PRJ[k])PRJ[k]=[];});
+const CONN={}; P.forEach(p=>CONN[p.id]=[]);
+REL.forEach(([a,b,t,w,refs])=>{CONN[a].push({o:b,t,w,refs});CONN[b].push({o:a,t,w,refs});});
+const projByCompany = c => Object.keys(PRJ).filter(k=>PROJ[k]&&PROJ[k][0]===c);
+const ids = (t,k)=> t==="companies"?[...new Set(COMP[k].map(e=>e[0]))]:t==="schools"?SCH[k]:PRJ[k];
+const score = (t,k)=> t==="people"?EXP(k):ids(t,k).reduce((a,id)=>a+EXP(id),0);
+const lastName = n=>n.split(" ").slice(-1)[0];
+
+function wikiURL(t,k){
+  let title="";
+  if(t==="people"){const w=byId[k].wiki;title=w?w.split("/wiki/")[1]:"";}
+  else if(t==="projects") title=(PROJ[k]&&PROJ[k][3])||"";
+  else title=WK[k.replace(" ?","")]||"";
+  const label=t==="people"?byId[k].n:k.replace(" ?","");
+  return title?{u:"https://en.wikipedia.org/wiki/"+title,exact:true}:{u:"https://en.wikipedia.org/w/index.php?search="+encodeURIComponent(label),exact:false};
+}
+function wikiBtn(t,k){const w=wikiURL(t,k);return `<a class="wiki" href="${w.u}" target="_blank" rel="noopener">${w.exact?"Wikipedia ↗":"Search Wikipedia ↗"}</a>`;}
+const refLabel = t=>decodeURIComponent(t).replace(/_/g," ");
+
+/* ---------- images ---------- */
+const IMG = (()=>{try{return JSON.parse(STORE.get("agiImg")||"{}");}catch(e){return {};}})();
+const pending = {};
+function wikiTitle(t,k){
+  if(t==="people"){const w=byId[k].wiki;return w?w.split("/wiki/")[1]:"";}
+  if(t==="projects")return (PROJ[k]&&PROJ[k][3])||"";
+  return "";
+}
+function imgSrc(t,k){
+  if(t==="people"&&byId[k]&&byId[k].img) return byId[k].img;
+  if(t==="companies"||t==="schools") return DOM[k]?`https://www.google.com/s2/favicons?domain=${DOM[k]}&sz=256`:"";
+  const key=t+"|"+k;
+  if(key in IMG) return IMG[key];
+  const title=wikiTitle(t,k);
+  if(!title){ if(t==="projects"&&PROJ[k]&&DOM[PROJ[k][0]]) return imgSrc("companies",PROJ[k][0]); return ""; }
+  if(!pending[key] && typeof fetch==="function"){
+    pending[key]=fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+title)
+     .then(r=>r.ok?r.json():{}).then(j=>{
+       let u=(j.thumbnail&&j.thumbnail.source)||"";
+       if(u) u=u.replace(/\/\d+px-/,"/400px-");
+       if(!u&&t==="projects"&&DOM[PROJ[k][0]]) u=imgSrc("companies",PROJ[k][0]);
+       IMG[key]=u; STORE.set("agiImg",JSON.stringify(IMG));
+       Array.from(document.querySelectorAll("[data-img]")).filter(el=>el.dataset.img===key).forEach(el=>fill(el,u));
+     }).catch(()=>{});
+  }
+  return null;
+}
+const initials = n=>n.replace(/[()\/]/g," ").split(/\s+/).filter(w=>/^[A-Za-z0-9]/.test(w)).map(w=>w[0]).join("").slice(0,2).toUpperCase();
+function fill(el,u){ if(u){el.innerHTML=`<img src="${u}" alt="" onerror="this.parentNode.textContent='${el.dataset.ini}'">`;} }
+function pic(t,k,cls){
+  const label=t==="people"?byId[k].n:k, ini=initials(label), sq=t==="people"?"":" sq";
+  const u=imgSrc(t,k);
+  const inner=u?`<img src="${u}" alt="" onerror="this.parentNode.textContent='${ini}'">`:ini;
+  return `<div class="${cls}${sq}" data-img="${t}|${k.replace(/"/g,"&quot;")}" data-ini="${ini}">${inner}</div>`;
+}
+
+/* ---------- rendering ---------- */
+let view="people", sel=null, sortBy="exp", zoom=parseFloat(STORE.get("agiZoom25")||"25");
+document.documentElement.style.fontSize=zoom+"px";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const v = s => esc(s).replace(/ \?/g,' <span class="verify">[Verify]</span>');
+const q_ = k=>k.replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,"&quot;");
+const L = (t,k,label,withPic)=>`<a class="lnk" onclick="go('${t}','${q_(k)}')">${withPic?pic(t,k,"thumb"):""}${v(label||k)}</a>`;
+const pL = id=>L("people",id,byId[id].n,true);
+const tag = b=>b==="S"?'<span class="tag src">Confirmed in book coverage</span>':'<span class="tag inf">Inferred</span>';
+
+function keys(){
+  const src = view==="people"?P.map(p=>p.id):Object.keys(view==="companies"?COMP:view==="schools"?SCH:PRJ);
+  const name = k=>view==="people"?lastName(byId[k].n):k;
+  return src.sort((a,b)=> sortBy==="az" ? name(a).localeCompare(name(b)) : (score(view,b)-score(view,a)) || name(a).localeCompare(name(b)));
+}
+function renderList(){
+  const q=$("q").value.toLowerCase();
+  $("list").innerHTML = keys().filter(k=>(view==="people"?byId[k].n:k).toLowerCase().includes(q)).map(k=>{
+    const label = view==="people"?`<span class="rank">#${RANK[k]}</span>${esc(byId[k].n)}`:esc(k);
+    const cnt = view==="people"?CONN[k].length+" links":ids(view,k).length+" ppl";
+    return `<div class="item" onclick="go('${view}','${q_(k)}')">${pic(view,k,"thumb")}<span class="nm">${label}</span><span class="count">${cnt}</span></div>`;
+  }).join("");
+}
+function connHTML(p){
+  const list=CONN[p.id].slice().sort((a,b)=>RANK[a.o]-RANK[b.o]);
+  if(!list.length) return "<i>None tracked.</i>";
+  return list.map(c=>{
+    const o=byId[c.o], w=wikiURL("people",c.o);
+    const rival=/rival|conflict|opponent|critic|rupture|split/i.test(c.t)?" rival":"";
+    const why=esc(c.w).replace(/\(book\)/g,'<span class="tag src">book</span>');
+    return `<div class="conn"><div class="top">${pL(c.o)}<span class="ctype${rival}">${esc(c.t)}</span></div>
+      <div class="why">${why}</div>
+      <div class="refs"><a class="wiki sm" href="${w.u}" target="_blank" rel="noopener">${esc(o.n)} ↗</a>${(c.refs||[]).map(r=>`<a class="wiki sm" href="https://en.wikipedia.org/wiki/${r}" target="_blank" rel="noopener">${esc(refLabel(r))} ↗</a>`).join("")}</div></div>`;
+  }).join("");
+}
+function personHTML(p){
+  return `<div class="hero">${pic("people",p.id,"photo")}<div>
+   <h2>${esc(p.n)}</h2><div>${tag(p.b)}</div><div class="sub">Book exposure rank #${RANK[p.id]} of ${P.length} (estimated)</div>${wikiBtn("people",p.id)}
+   <p>${esc(p.bio)}</p></div></div>
+   <h3>Important connections (${CONN[p.id].length})</h3>${connHTML(p)}
+   <h3>Companies</h3><table><tr><th>Company</th><th>Years</th></tr>${p.c.map(([c,y])=>`<tr><td>${L("companies",c,c,true)}</td><td>${v(y)}</td></tr>`).join("")}</table>
+   <h3>Schools</h3><div class="chips">${p.s.length?p.s.map(s=>L("schools",s.replace(" ?",""),s,true)).join(""):"<i>No formal degree</i>"}</div>
+   <h3>Key AI projects</h3><div class="chips">${p.pr.map(r=>L("projects",r,r,true)).join("")}</div>`;
+}
+function companyHTML(c){
+  const pr=projByCompany(c);
+  return `<div class="hero">${pic("companies",c,"photo")}<div><h2>${esc(c)}</h2>${wikiBtn("companies",c)}</div></div>
+  <h3>People from this list</h3><table><tr><th>Person</th><th>Years</th></tr>${COMP[c].map(([id,y])=>`<tr><td>${pL(id)}</td><td>${v(y)}</td></tr>`).join("")}</table>
+  <h3>Projects developed here</h3>${pr.length?`<div class="chips">${pr.map(k=>L("projects",k,k,true)).join("")}</div>`:"<i>None tracked.</i>"}`;
+}
+function schoolHTML(s){
+  return `<div class="hero">${pic("schools",s,"photo")}<div><h2>${esc(s)}</h2>${wikiBtn("schools",s)}</div></div>
+  <h3>Alumni from this list</h3><div class="chips">${SCH[s].map(pL).join("")}</div>
+  <h3>Companies these alumni worked at</h3><div class="chips">${[...new Set(SCH[s].flatMap(id=>byId[id].c.map(c=>c[0])))].map(c=>L("companies",c,c,true)).join("")}</div>`;
+}
+function projectHTML(k){
+  const m=PROJ[k]||["—","—",""];
+  return `<div class="hero">${pic("projects",k,"photo")}<div><h2>${esc(k)}</h2>${wikiBtn("projects",k)}<p>${esc(m[2])}</p></div></div>
+  <table><tr><th>Developed at</th><th>Year</th></tr><tr><td>${COMP[m[0]]?L("companies",m[0],m[0],true):esc(m[0])}</td><td>${m[1]}</td></tr></table>
+  <h3>People involved</h3><div class="chips">${PRJ[k].map(pL).join("")||"<i>—</i>"}</div>`;
+}
+const foot=`<div class="note"><b>Book exposure</b> is an estimated ranking of how prominent each person is in the book; companies, schools and projects are scored by the exposure of their linked people. <b>Confirmed in book coverage</b> = appears in published excerpts, reviews or Roose interviews; <b>Inferred</b> = likely, based on the book's stated topics. Connection notes tagged <span class="tag src">book</span> come from book excerpts/reviews; the rest are general knowledge. Bios, schools, years and projects are general knowledge. <span class="verify">[Verify]</span> marks uncertain facts. Photos load from Wikipedia and logos from site icons (internet required). Draft research aid.</div>`;
+function renderDetail(){
+  const html=view==="people"?personHTML(byId[sel]):view==="companies"?companyHTML(sel):view==="schools"?schoolHTML(sel):projectHTML(sel);
+  $("detail").innerHTML=`<button id="back" onclick="hBack()">&larr; Back</button>`+html+foot;
+  document.querySelector("main").classList.add("show-detail");
+  $("q").style.display="none"; $("sorts").style.display="none";
+  window.scrollTo(0,0);
+}
+function showList(){
+  document.querySelector("main").classList.remove("show-detail");
+  $("q").style.display=""; $("sorts").style.display="";
+  renderList(); window.scrollTo(0,0);
+}
+function setTabs(){document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.v===view));
+  document.querySelectorAll(".sorts button[data-s]").forEach(b=>b.classList.toggle("active",b.dataset.s===sortBy));}
+function applyState(st){view=st.v||"people";sel=st.k||null;setTabs();if(sel)renderDetail();else showList();}
+function go(t,k){view=t;sel=k;hPush({v:t,k:k});setTabs();renderDetail();}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{view=b.dataset.v;sel=null;$("q").value="";hPush({v:view});setTabs();showList();});
+document.querySelectorAll(".sorts button[data-s]").forEach(b=>b.onclick=()=>{sortBy=b.dataset.s;setTabs();renderList();});
+document.querySelectorAll(".sorts button[data-z]").forEach(b=>b.onclick=()=>{zoom=Math.min(60,Math.max(14,zoom+2*b.dataset.z));document.documentElement.style.fontSize=zoom+"px";STORE.set("agiZoom25",zoom);});
+$("q").oninput=renderList;
+window.onpopstate=e=>{if(NAV.length>1)NAV.pop();applyState(e.state||NAV[NAV.length-1]||{v:"people"});};
+NAV.push({v:"people"});if(HIST_OK){try{history.replaceState({v:"people"},"");}catch(e){HIST_OK=false;}}
+setTabs(); showList();
+</script>
+</body>
+</html>
